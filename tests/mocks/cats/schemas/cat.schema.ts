@@ -21,10 +21,22 @@ export class Cat extends Document {
     default: [],
   })
   kitten: Types.ObjectId[];
+
+  @Prop({ default: Date.now })
+  createdAt: Date;
+
+  @Prop({ default: Date.now })
+  updatedAt: Date;
 }
 
 export const CatSchema = SchemaFactory.createForClass(Cat);
 
 defineAccessPolicy<Cat>(CatSchema, 'ownerValidation', {
-  rule: (getEnrichment) => ({ ownerId: getEnrichment('ownerId') }),
+  type: ['save', 'query', 'update', 'delete', 'count'],
+  rule: (get) => ({ ownerId: get('ownerId') }),
+});
+
+defineAccessPolicy<Cat>(CatSchema, 'updatedAt', {
+  type: ['save', 'update'],
+  rule: () => ({ updatedAt: Date.now() }),
 });
