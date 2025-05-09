@@ -20,10 +20,10 @@ export const EnrichmentsStore = {
 };
 
 export const runWithCtx = (
-  fx: (ctx: Record<string, any>) => any,
+  nextFn: (ctx: Record<string, any>) => any,
   context: Record<string, any> = {},
 ) => {
   return enrichmentsStore.run(context, () => {
-    return fx(context);
+    return nextFn(context);
   });
 };

@@ -1,21 +1,20 @@
 import { Schema, Document } from 'mongoose';
 
-export const DAC_RULES_KEY = '__dacRules';
+export const DAC_RULES_PREFIX = '__dacRules_';
 
-export interface AccessPolicy<T = any> {
-  rule: (
-    getEnrichment: (key: string) => any,
-  ) => Partial<Record<keyof Omit<T, keyof Document>, any>>;
+export type AccessPolicyRuleType = 'query' | 'count' | 'update' | 'delete' | 'save';
+
+export interface AccessPolicyRule<T = any> {
+  type: AccessPolicyRuleType | AccessPolicyRuleType[];
+  rule: (get: (key: string) => any) => Partial<Record<keyof Omit<T, keyof Document>, any>>;
 }
 
 export interface DACRules {
-  [key: string]: AccessPolicy;
+  [key: string]: AccessPolicyRule;
 }
 
-export function defineAccessPolicy<T>(schema: Schema, key: string, policy: AccessPolicy<T>) {
-  const existingRules = (DAC_RULES_KEY in schema ? (schema as any)[DAC_RULES_KEY] : {}) as DACRules;
-
-  schema.statics[DAC_RULES_KEY] = function () {
-    return { ...existingRules, [key]: policy };
+export function defineAccessPolicy<T>(schema: Schema, key: string, policy: AccessPolicyRule<T>) {
+  schema.statics[`${DAC_RULES_PREFIX}${key}`] = function () {
+    return policy;
   };
 }

@@ -61,7 +61,7 @@ export class MongoDbTestkit {
     const mappedPort = this.startedMongoDBContainer.getMappedPort(MONGODB_PORT);
 
     this.url = `mongodb://root:${ROOT_PASSWORD}@localhost:${mappedPort}`;
-    logger.info('Mongo container started, root password:', ROOT_PASSWORD);
+    logger.info(`Mongo container started on port ${mappedPort}`);
 
     this.client = new MongoClient(this.url);
     await this.client.connect();

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EnrichmentsStore } from './enrichments-async-store.provider';
+import { EnrichmentsStore } from './enrichments.store';
 
 @Injectable()
 export class EnrichmentsService {

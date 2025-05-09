@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { EnrichmentsService } from './enrichments.service';
-import { runWithCtx } from './enrichments-async-store.provider';
+import { runWithCtx } from './enrichments.store';
 
 @Module({
   providers: [EnrichmentsService],
