@@ -1,11 +1,17 @@
-name: Pull Request Flow
+name: Release Flow
 
 on:
-  pull_request:
-    branches: ['**']
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  packages: write
 
 jobs:
-  test:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: checkout code
@@ -19,3 +25,8 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
+      - name: semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx semantic-release

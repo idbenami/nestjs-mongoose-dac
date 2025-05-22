@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { AccessPolicyRuleType, DAC_RULES_PREFIX, DACRules } from '../decorators';
+import { AccessPolicyRuleType, DAC_RULES_PREFIX, DACRules } from './rule-definer';
 import { EnrichmentsService } from './enrichments.service';
 
 type EnrichmentFunction = () => Partial<Record<string | number | symbol, any>>;
@@ -7,6 +7,8 @@ type EnrichmentFunction = () => Partial<Record<string | number | symbol, any>>;
 const hasRules = (rules: Record<any, EnrichmentFunction>): boolean => {
   return Object.keys(rules).length > 0;
 };
+
+const ruleTypes = ['query', 'count', 'update', 'delete', 'save'] as const;
 
 const buildFields = (
   rules: Record<any, EnrichmentFunction>,
@@ -53,8 +55,6 @@ export function applyAccessControlPlugin(
     save: {},
   };
 
-  const ruleTypes = ['query', 'count', 'update', 'delete', 'save'] as const;
-
   for (const ruleKey in dacRules) {
     const ruleDefinition = dacRules[ruleKey];
     const ruleFn = () => ruleDefinition.rule(getEnrichment);
@@ -68,6 +68,7 @@ export function applyAccessControlPlugin(
     }
   }
 
+  // query: find, findOne, distinct
   if (hasRules(enrichmentsOptionsMap.query)) {
     for (const method of ['find', 'findOne'] as const) {
       schema.pre(method, { document: false, query: true }, function (next) {
@@ -86,6 +87,7 @@ export function applyAccessControlPlugin(
     });
   }
 
+  // count: countDocuments, estimatedDocumentCount
   if (hasRules(enrichmentsOptionsMap.count)) {
     schema.pre('countDocuments', { document: false, query: true }, function (next) {
       const fields = buildFields(enrichmentsOptionsMap.count);
@@ -102,6 +104,7 @@ export function applyAccessControlPlugin(
     });
   }
 
+  // update: updateOne, updateMany, findOneAndUpdate, replaceOne, findOneAndReplace
   if (hasRules(enrichmentsOptionsMap.update)) {
     schema.pre('updateOne', { document: true, query: false }, function (next) {
       const fields = buildFields(enrichmentsOptionsMap.update);
@@ -169,6 +172,7 @@ export function applyAccessControlPlugin(
     });
   }
 
+  // delete: deleteOne, deleteMany, findOneAndDelete
   if (hasRules(enrichmentsOptionsMap.delete)) {
     schema.pre('deleteOne', { document: true, query: false }, function (next) {
       const fields = buildFields(enrichmentsOptionsMap.delete);
@@ -201,6 +205,7 @@ export function applyAccessControlPlugin(
     });
   }
 
+  // save: save, insertMany
   if (hasRules(enrichmentsOptionsMap.save)) {
     schema.pre('save', function (next) {
       const fields = buildFields(enrichmentsOptionsMap.save);

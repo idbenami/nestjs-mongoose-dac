@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 @Injectable()
 export class CatOwnerInterceptor implements NestInterceptor {
   constructor(private readonly enrichmentsService: EnrichmentsService) {}
+
   intercept(
     context: ExecutionContext,
     next: CallHandler<any>,

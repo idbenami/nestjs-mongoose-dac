@@ -1,5 +1,5 @@
 import { Document, Types } from 'mongoose';
-import { defineAccessPolicy, Prop, Schema, SchemaFactory } from '../../../../src';
+import { defineRule, Prop, Schema, SchemaFactory } from '../../../../src';
 
 @Schema()
 export class Cat extends Document {
@@ -31,12 +31,12 @@ export class Cat extends Document {
 
 export const CatSchema = SchemaFactory.createForClass(Cat);
 
-defineAccessPolicy<Cat>(CatSchema, 'ownerValidation', {
+defineRule<Cat>(CatSchema, 'ownerValidation', {
   type: ['save', 'query', 'update', 'delete', 'count'],
   rule: (get) => ({ ownerId: get('ownerId') }),
 });
 
-defineAccessPolicy<Cat>(CatSchema, 'updatedAt', {
+defineRule<Cat>(CatSchema, 'updatedAt', {
   type: ['save', 'update'],
   rule: () => ({ updatedAt: Date.now() }),
 });

@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { EnrichmentsStore } from './enrichments.store';
 
+/**
+ * @publicApi
+ */
 @Injectable()
 export class EnrichmentsService {
   constructor() {}
