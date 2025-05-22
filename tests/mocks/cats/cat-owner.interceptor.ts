@@ -18,7 +18,11 @@ export class CatOwnerInterceptor implements NestInterceptor {
       .find((row) => row.startsWith('ownerId='))
       ?.split('=')[1];
 
-    this.enrichmentsService.setGlobalEnrichment('ownerId', ownerId);
+    if (ownerId) {
+      this.enrichmentsService.setGlobalEnrichment('ownerId', ownerId);
+    } else {
+      this.enrichmentsService.setGlobalEnrichment('ownerId', '1');
+    }
 
     return next.handle();
   }
