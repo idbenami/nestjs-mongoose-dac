@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 @Injectable()
 export class CatOwnerInterceptor implements NestInterceptor {
   constructor(private readonly enrichmentsService: EnrichmentsService) {}
+
   intercept(
     context: ExecutionContext,
     next: CallHandler<any>,
@@ -17,11 +18,7 @@ export class CatOwnerInterceptor implements NestInterceptor {
       .find((row) => row.startsWith('ownerId='))
       ?.split('=')[1];
 
-    if (ownerId) {
-      this.enrichmentsService.setGlobalEnrichment('ownerId', ownerId);
-    } else {
-      this.enrichmentsService.setGlobalEnrichment('ownerId', '1');
-    }
+    this.enrichmentsService.setGlobalEnrichment('ownerId', ownerId);
 
     return next.handle();
   }
