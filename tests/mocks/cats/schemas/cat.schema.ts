@@ -31,12 +31,12 @@ export class Cat extends Document {
 
 export const CatSchema = SchemaFactory.createForClass(Cat);
 
-defineRule<Cat>(CatSchema, 'ownerValidation', {
+defineRule(CatSchema, 'ownerValidation', {
   type: ['save', 'query', 'update', 'delete', 'count'],
   rule: (get) => ({ ownerId: get('ownerId') }),
 });
 
-defineRule<Cat>(CatSchema, 'updatedAt', {
+defineRule(CatSchema, 'updatedAt', {
   type: ['save', 'update'],
-  rule: () => ({ updatedAt: Date.now() }),
+  rule: () => ({ updatedAt: new Date() }),
 });

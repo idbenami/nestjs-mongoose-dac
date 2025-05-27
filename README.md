@@ -129,18 +129,21 @@ For detailed API reference of `@nestjs/mongoose`, please refer to the official [
 
 ### `defineRule`
 
-- **`defineRule<T>(schema: Schema, key: string, policy: AccessPolicyRule<T>): void`**
+- **`defineRule(schema: Schema, key: string, policy: AccessPolicyRule): void`**
   - Defines an access policy for a Mongoose schema.
   - `schema`: The Mongoose schema to which the rule applies.
   - `key`: The name of the rule - should be unique per schema.
   - `policy`: The access policy rule object, which includes:
-    - `type`: An array of `AccessPolicyRuleType`, each one representing mongoose operations.
-      - query: `find`, `findOne`, `distinct`
-      - count: `countDocuments`, `estimatedDocumentCount`
-      - update: `updateOne`, `updateMany`, `findOneAndUpdate`, `replaceOne`, `findOneAndReplace`
-      - delete: `deleteOne`, `deleteMany`, `findOneAndDelete`
-      - save: `save` (document level), `insertMany`
-    - `rule`: A function that takes a `get` function and returns a query object or a boolean.
+    - `type`: A single `RuleType` or an array of `RuleType`s, each indicating a type of operation. Supported types and corresponding operations are:
+      - `'query'`: `find`, `findOne`, `distinct`
+      - `'count'`: `countDocuments`, `estimatedDocumentCount`
+      - `'update'`: `updateOne`, `updateMany`, `findOneAndUpdate`, `replaceOne`, `findOneAndReplace`
+      - `'delete'`: `deleteOne`, `deleteMany`, `findOneAndDelete`
+      - `'save'`: `save` (document-level), `insertMany`
+    - `rule`: A function that receives a `get` function (to retrieve dynamic values like user ID)
+      and returns an object specifying field-level constraints:
+      - For `query` and `count` types: values can be plain values or MongoDB query selectors (e.g., `$eq`, `$gte`, `$in`).
+      - For all other types: only plain values are allowed, matching the field's original type in the schema.
 
 ### `EnrichmentsService`
 
@@ -162,6 +165,10 @@ For detailed API reference of `@nestjs/mongoose`, please refer to the official [
 ### Why not just use `@nestjs/mongoose`?
 
 `@nestjs/mongoose` is the base package for working with Mongoose in NestJS. However, it does not enhances or offers more "fullstack" tools to ease the work with the database. This package extends `@nestjs/mongoose` to add access-rules capabilities, enrichments and more, making it easier to create and manage complex workflows.
+
+### How does the rules work?
+
+The `defineRule` function allows you to define access policies for Mongoose schemas. Each rule can specify the type of operations it applies to (e.g., query, update, delete) and the logic for determining access. The rules are enforced automatically during Mongoose operations using Mongoose `pre` hook.
 
 ### How does the enrichments work?
 

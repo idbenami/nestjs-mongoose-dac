@@ -1,18 +1,32 @@
-import { Schema, Document } from 'mongoose';
+import { Schema, Document, QuerySelector, Model } from 'mongoose';
 
 export const DAC_RULES_PREFIX = '__dacRules_';
 
 /**
  * @publicApi
  */
-export type AccessPolicyRuleType = 'query' | 'count' | 'update' | 'delete' | 'save';
+export type RuleType = 'query' | 'count' | 'update' | 'delete' | 'save';
+
+type QueryLike = 'query' | 'count';
+
+type IsOnlyQueryOrCount<RT> = RT extends QueryLike
+  ? Exclude<RT, QueryLike> extends never
+    ? true
+    : false
+  : false;
+
+type RuleField<T, RT> = IsOnlyQueryOrCount<RT> extends true ? QuerySelector<T> | T : T;
+
+type ExtractModelType<S> = S extends Schema<infer T, any, any, any> ? T : never;
 
 /**
  * @publicApi
  */
-export interface AccessPolicyRule<T = any> {
-  type: AccessPolicyRuleType | AccessPolicyRuleType[];
-  rule: (get: (key: string) => any) => Partial<Record<keyof Omit<T, keyof Document>, any>>;
+export interface AccessPolicyRule<T extends Model<any> = any, RT extends RuleType = RuleType> {
+  type: RT[];
+  rule: (get: (key: string) => any) => {
+    [K in keyof Omit<T, keyof Document>]?: RuleField<T[K], RT>;
+  };
 }
 
 export interface DACRules {
@@ -26,7 +40,11 @@ export interface DACRules {
  * @param policy the access policy rule
  * @publicApi
  */
-export function defineRule<T>(schema: Schema, key: string, policy: AccessPolicyRule<T>) {
+export function defineRule<T extends Schema<any> = any, RT extends RuleType = RuleType>(
+  schema: T,
+  key: string,
+  policy: AccessPolicyRule<ExtractModelType<T>, RT>,
+) {
   schema.statics[`${DAC_RULES_PREFIX}${key}`] = function () {
     return policy;
   };
