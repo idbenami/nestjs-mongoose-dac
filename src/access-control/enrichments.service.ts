@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EnrichmentsStore } from './enrichments.store';
+import { SchemaFieldType } from '../common/types';
 
 /**
  * @publicApi
@@ -8,7 +9,7 @@ import { EnrichmentsStore } from './enrichments.store';
 export class EnrichmentsService {
   constructor() {}
 
-  setEnrichment(schemaName: string, key: string, value: unknown) {
+  setEnrichment(schemaName: string, key: string, value: SchemaFieldType) {
     const store = EnrichmentsStore.getContext();
     if (!store) {
       throw new Error('Enrichments store is not initialized');
@@ -19,7 +20,7 @@ export class EnrichmentsService {
     EnrichmentsStore.updateContext(store);
   }
 
-  setGlobalEnrichment(key: string, value: unknown) {
+  setGlobalEnrichment(key: string, value: SchemaFieldType) {
     const store = EnrichmentsStore.getContext();
     if (!store) {
       throw new Error('Enrichments store not found');
@@ -30,7 +31,7 @@ export class EnrichmentsService {
     EnrichmentsStore.updateContext(store);
   }
 
-  getEnrichment(schemaName: string, key: string): unknown {
+  getEnrichment(schemaName: string, key: string): SchemaFieldType {
     const store = EnrichmentsStore.getContext();
     if (!store) {
       throw new Error('Enrichments store not found');

@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { AccessPolicyRuleType, DAC_RULES_PREFIX, DACRules } from './rule-definer';
+import { RuleType, DAC_RULES_PREFIX, DACRules } from './rule-definer';
 import { EnrichmentsService } from './enrichments.service';
 
 type EnrichmentFunction = () => Partial<Record<string | number | symbol, any>>;
@@ -47,7 +47,7 @@ export function applyAccessControlPlugin(
     throw new Error(`Enrichment function for key "${key}" not found`);
   };
 
-  const enrichmentsOptionsMap: Record<AccessPolicyRuleType, Record<string, EnrichmentFunction>> = {
+  const enrichmentsOptionsMap: Record<RuleType, Record<string, EnrichmentFunction>> = {
     query: {},
     count: {},
     update: {},
